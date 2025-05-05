@@ -5,7 +5,7 @@ Ever wondered how transit states turn migrant flows into a diplomatic bargaining
 
 ## Project Overview
 
-We focus on all English‐language speeches by Turkish President Erdoğan (2014–2025), web‐scraped from the official presidency website. After manually annotating a balanced sample, we train:
+I focus on all English‐language speeches by Turkish President Erdoğan (2014–2025), web‐scraped from the official presidency website. After manually annotating a balanced sample, I train:
 
 * **Logistic Regression + TF–IDF**
   (with spaCy/NLTK preprocessing & SMOTE)
@@ -21,7 +21,7 @@ and evaluate both on a held-out test set as well as via 5-fold cross-validation.
 * **Demonstrate how contextual embeddings** improve detection recall (critical for catching true threats)
 * **Provide a reusable pipeline** for analyzing WOM in other transit-migration contexts
 
-##️ Methods
+## Methods
 
 ### Data Acquisition
 
@@ -61,30 +61,6 @@ and evaluate both on a held-out test set as well as via 5-fold cross-validation.
 * **Recall Boost:** +14.5 pts (72.2 → 86.8) reduces missed threats
 * **F₁ Improvement:** +7.5 pts (71.2 → 78.7) for balanced detection
 * **5-Fold CV (DistilBERT):** 84.3 % ± 2.9 % accuracy (stable performance)
-
-## Getting Started
-
-```bash
-# 1) Clone the repository
-git clone https://github.com/yourusername/sp2025-migration.git
-cd sp2025-migration
-
-# 2) Create & activate a virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# 3) Install dependencies
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
-
-# 4) Run the notebooks in sequence:
-    1) notebooks/wom_data_webscraping.ipynb
-    2) notebooks/wom_zeroshot_classification.ipynb
-    3) notebooks/wom_nlp_model.ipynb
-
-# 5) Inspect outputs & final model
-ls models/best_threat_model_spacy_ner.pkl
-```
 
 ## Repository Structure
 
