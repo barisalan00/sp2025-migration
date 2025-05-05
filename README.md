@@ -72,9 +72,9 @@ sp2025-migration/
 │   └── wom_nlp_model.ipynb
 ├── models/
 │   └── wom_nlp_model.ipynb
-├── README.Rmd             # This README in RMarkdown format
+├── README.Rmd            
 └── report/
-    └── report.pdf         # Full write-up
+    └── report.pdf        
 ```
 
 ## Further Reading
