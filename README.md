@@ -1,42 +1,123 @@
-# CMPS 6730 Sample Project
 
-This repository contains starter code for the final project in CMPS 4730/6730: Natural Language Processing at Tulane University.
+```yaml
+---
+title: "Weaponization of Migration Flows (WOM) Classification"
+output: github_document
+---
+```
 
-The code in this repository will be copied into your team's project repository at the start of class to provide a starting point for your project.
+# Weaponization of Migration Flows (WOM) Classification
 
-You should edit this file to include a summary of the goals, methods, and conclusions of your project.
+Ever wondered how transit states turn migrant flows into a diplomatic bargaining chip? In this project, we develop and compare two NLP pipelines to automatically detect when political leaders threaten to “open the borders” or criticize destination countries’ migration policies—a tactic we term the **Weaponization of Migration Flows (WOM)**.
 
-The structure of the code supports the following:
+## Project Overview
 
-- A simple web UI using Flask to support a demo of the project
-- A command-line interface to support running different stages of the project's pipeline
-- The ability to easily reproduce your work on another machine by using virtualenv and providing access to external data sources.
+We focus on all English‐language speeches by Turkish President Erdoğan (2014–2025), web‐scraped from the official presidency website. After manually annotating a balanced sample, we train:
 
-### Using this repository
+* **Logistic Regression + TF–IDF**
+  (with spaCy/NLTK preprocessing & SMOTE)
+* **Fine-tuned DistilBERT**
+  (with Hugging Face Transformers)
 
-- At the start of the course, students will be divided into project teams. Each team will receive a copy of this starter code in a new repository. E.g.:
-https://github.com/tulane-cmps6730/project-alpha
-- Each team member will then clone their team repository to their personal computer to work on their project. E.g.: `git clone https://github.com/tulane-cmps6730/project-alpha`
-- See [GettingStarted.md](GettingStarted.md) for instructions on using the starter code.
+and evaluate both on a held-out test set as well as via 5-fold cross-validation.
 
+## Goals
 
-### Contents
+* **Quantify WOM** by detecting “threat” or “criticism” rhetoric in presidential speeches
+* **Compare classical vs. transformer-based models**
+* **Demonstrate how contextual embeddings** improve detection recall (critical for catching true threats)
+* **Provide a reusable pipeline** for analyzing WOM in other transit-migration contexts
 
-- [docs](docs): template to create slides for project presentations
-- [nlp](nlp): Python project code
-- [notebooks](notebooks): Jupyter notebooks for project development and experimentation
-- [report](report): LaTeX report
-- [tests](tests): unit tests for project code
+##️ Methods
 
-### Background Resources
+### Data Acquisition
 
-The following will give you some technical background on the technologies used here:
+1. Web-scraped 242 speeches → 3,976 paragraphs
+2. Filtered out “visit”/“phone call” notices & salutations
 
-1. Refresh your Python by completing this online tutorial: <https://www.learnpython.org/> (3 hours)
-2. Create a GitHub account at <https://github.com/>
-3. Setup git by following <https://help.github.com/en/articles/set-up-git> (30 minutes)
-4. Learn git by completing the [Introduction to GitHub](https://lab.github.com/githubtraining/introduction-to-github) tutorial, reading the [git handbook](https://guides.github.com/introduction/git-handbook/), then completing the [Managing merge conflicts](https://lab.github.com/githubtraining/managing-merge-conflicts) tutorial (1 hour).
-5. Install the Python data science stack from <https://www.anaconda.com/distribution/> . **We will use Python 3** (30 minutes)
-6. Complete the scikit-learn tutorial from <https://www.datacamp.com/community/tutorials/machine-learning-python> (2 hours)
-7. Understand how python packages work by going through the [Python Packaging User Guide](https://packaging.python.org/tutorials/) (you can skip the "Creating Documentation" section). (1 hour)
-8. Complete Part 1 of the [Flask tutorial](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world), which is the library we will use for making a web demo for your project.
+### Annotation
+
+1. Hand-label 472 random paragraphs → only 16 positive WOM
+2. Zero-shot classification (`facebook/bart-large-mnli`) → hand-verify → 338 WOM-positive + 500 WOM-negative
+
+### Baseline Model
+
+* **Preprocessing:** spaCy tokenization & lemmatization + NLTK stop-word removal + custom NER tokens
+* **Features:** `TfidfVectorizer` (grid-searched n-grams & `min_df`)
+* **Balancing:** SMOTE
+* **Classifier:** `LogisticRegression`
+
+### Advanced Model
+
+* **Preprocessing:** spaCy/NLTK pipeline → BERT tokenization
+* **Model:** Fine-tune `distilbert-base-uncased` for 3 epochs
+* **Library:** Hugging Face Transformers
+
+### Evaluation
+
+* **Hold-out (20% data):** Accuracy, Precision, Recall, F₁
+* **5-Fold CV:** mean ± std accuracy
+
+## Key Results
+
+| Model                           | Accuracy | Precision | Recall |   F₁   |
+| :------------------------------ | :------: | :-------: | :----: | :----: |
+| Logistic Regression with TF–IDF |  0.7143  |   0.7143  | 0.7224 | 0.7117 |
+| Advanced DistilBERT Model       |  0.8095  |   0.7195  | 0.8676 | 0.7867 |
+
+* **Recall Boost:** +14.5 pts (72.2 → 86.8) reduces missed threats
+* **F₁ Improvement:** +7.5 pts (71.2 → 78.7) for balanced detection
+* **5-Fold CV (DistilBERT):** 84.3 % ± 2.9 % accuracy (stable performance)
+
+## Getting Started
+
+```bash
+# 1) Clone the repository
+git clone https://github.com/yourusername/sp2025-migration.git
+cd sp2025-migration
+
+# 2) Create & activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 3) Install dependencies
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+
+# 4) Run the notebooks in sequence:
+    1) notebooks/wom_data_webscraping.ipynb
+    2) notebooks/wom_zeroshot_classification.ipynb
+    3) notebooks/wom_nlp_model.ipynb
+
+# 5) Inspect outputs & final model
+ls models/best_threat_model_spacy_ner.pkl
+```
+
+## Repository Structure
+
+```
+sp2025-migration/
+├── notebooks/
+│   ├── wom_data_webscraping.ipynb
+│   ├── wom_zeroshot_classification.ipynb
+│   └── wom_nlp_model.ipynb
+├── models/
+│   └── wom_nlp_model.ipynb
+├── README.Rmd             # This README in RMarkdown format
+└── report/
+    └── report.pdf         # Full write-up
+```
+
+## Further Reading
+
+For a detailed walkthrough, see the full project report:
+
+Alan, B. (2025). *An NLP Approach to Weaponization of Migration Flows*. Tulane University.
+\[report/Report.pdf]
+
+---
+
+*Developed by Baris Alan, Tulane University ([balan@tulane.edu](mailto:balan@tulane.edu))*
+
+```
+```
