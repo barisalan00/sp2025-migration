@@ -1,11 +1,4 @@
 
-```yaml
----
-title: "Weaponization of Migration Flows (WOM) Classification"
-output: github_document
----
-```
-
 # Weaponization of Migration Flows (WOM) Classification
 
 Ever wondered how transit states turn migrant flows into a diplomatic bargaining chip? In this project, we develop and compare two NLP pipelines to automatically detect when political leaders threaten to “open the borders” or criticize destination countries’ migration policies—a tactic we term the **Weaponization of Migration Flows (WOM)**.
